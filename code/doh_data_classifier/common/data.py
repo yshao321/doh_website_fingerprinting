@@ -75,6 +75,20 @@ def parse_file(fpath):
         except Exception as e:
             print ("ERROR:", fpath, e)
 
+def select_df_by_black_files(df, dpath):
+    black_list = []
+    for root, _, files in os.walk(dpath):
+        for fname in files:
+            if not fname.endswith('.blk'):
+                continue
+            black_file = os.path.join(root, fname)
+            df_black = pd.read_csv(black_file, header=None)
+            black_list.extend(df_black.iloc[:,0].tolist())
+    
+    selected = ~df.class_label.isin(map(str, black_list))
+    df_selected = df[selected]
+    return df_selected
+
 def load_data(path):
     selected_files = []
     pickle_file = None
@@ -87,6 +101,7 @@ def load_data(path):
         if os.path.isfile(pickle_file):
             print("read data from pickle")
             df = pd.read_pickle(pickle_file)
+            df = select_df_by_black_files(df, path)
             return df
         
         dpath = path
@@ -111,6 +126,7 @@ def load_data(path):
         print("save data into pickle")
         df.to_pickle(pickle_file)
 
+    df = select_df_by_black_files(df, path)
     return df
 
 def join_str(lengths):

@@ -73,7 +73,7 @@ def classify(df_train, df_valid):
 
 num_classes = 5000   # Number of classes (sites)
 num_samples = 10     # Number of samples for each class (site)
-min_packets = 10     # Minimum of packets for each row (record)
+min_packets = 1      # Minimum of packets for each row (record)
 max_packets = 50     # Maximun of packets for each row (record)
 token_index = {}     # An index of all tokens in the data
 
