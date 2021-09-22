@@ -77,7 +77,7 @@ token_index = {}     # An index of all tokens in the data
 
 def classifier_train():
     # Locate dataset
-    data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'summer')
+    data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'train')
     print(data_dir)
 
     # Load dataset

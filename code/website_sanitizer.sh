@@ -42,17 +42,17 @@ function is_website_black {
     fi
     
     ### check website keywords
-    if grep   -iq "Web Page Blocked" website_file; then
+    if   grep -iq "<title>Web Page Blocked" website_file; then
       website_return="blocked"
-    elif grep -iq "Not Found"        website_file; then
+    elif grep -iq "<title>404 Not Found"    website_file; then
       website_return="not_found"
-    elif grep -iq "403 Forbidden"    website_file; then
+    elif grep -iq "<title>403 Forbidden"    website_file; then
       website_return="forbidden"
-    elif grep -iq "Access Denied"    website_file; then
+    elif grep -iq "<title>Access Denied"    website_file; then
       website_return="denied"
-    elif grep -iq "Invalid URL"      website_file; then
+    elif grep -iq "<title>Invalid URL"      website_file; then
       website_return="invalid"
-    elif grep -iq "<Error>"          website_file; then
+    elif grep -iq "<Error>"                 website_file; then
       website_return="error"
     fi
     

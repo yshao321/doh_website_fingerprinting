@@ -96,7 +96,7 @@ max_packets = 50   # Maximun of packets for each row (record)
 
 def classifier_train():
     # Locate dataset
-    data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'summer')
+    data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'train')
     print(data_dir)
 
     # Load dataset

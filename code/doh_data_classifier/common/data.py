@@ -10,6 +10,9 @@ import pandas as pd
 from functools import partial
 from os.path import join, dirname, abspath, pardir, basename
 
+PROJECT_DIR = abspath(join(dirname(__file__), pardir, pardir, pardir))
+COLLECTION_DIR = join(PROJECT_DIR, 'collection')
+
 def select_df_by_samples(df, num_samples):
     df2 = df.copy()
     df2['selected'] = False
@@ -39,25 +42,41 @@ def select_df_by_max_classes(df, max_classes):
     df_selected = df[selected]
     return df_selected
 
+def select_df_by_min_classes(df, min_classes):
+    selected = ~df.class_label.isin(map(str, range(min_classes + 1)))
+    df_selected = df[selected]
+    return df_selected
+
+def select_df_by_black_files(df, dpath):
+    black_list = []
+    for root, _, files in os.walk(dpath):
+        for fname in files:
+            if not fname.endswith('.blk'):
+                continue
+            black_file = os.path.join(root, fname)
+            df_black = pd.read_csv(black_file, header=None)
+            black_list.extend(df_black.iloc[:,0].tolist())
+    
+    selected = ~df.class_label.isin(map(str, black_list))
+    df_selected = df[selected]
+    return df_selected
+
 def clean_df_closed(df, min_packets, max_packets, max_classes, num_samples):
     df = select_df_by_packets(df, min_packets, max_packets)
     df = select_df_by_samples(df, num_samples)
     df = select_df_by_max_classes(df, max_classes)
+    df = select_df_by_black_files(df, COLLECTION_DIR)
     
     df = df.sort_values('class_label')
     df.index = range(len(df.index))
 
     return df
 
-def select_df_by_min_classes(df, min_classes):
-    selected = ~df.class_label.isin(map(str, range(min_classes + 1)))
-    df_selected = df[selected]
-    return df_selected
-
 def clean_df_opened(df, min_packets, max_packets, min_classes, num_samples):
     df = select_df_by_packets(df, min_packets, max_packets)
     df = select_df_by_samples(df, num_samples)
     df = select_df_by_min_classes(df, min_classes)
+    df = select_df_by_black_files(df, COLLECTION_DIR)
     
     df = df.sort_values('class_label')
     df.index = range(len(df.index))
@@ -75,20 +94,6 @@ def parse_file(fpath):
         except Exception as e:
             print ("ERROR:", fpath, e)
 
-def select_df_by_black_files(df, dpath):
-    black_list = []
-    for root, _, files in os.walk(dpath):
-        for fname in files:
-            if not fname.endswith('.blk'):
-                continue
-            black_file = os.path.join(root, fname)
-            df_black = pd.read_csv(black_file, header=None)
-            black_list.extend(df_black.iloc[:,0].tolist())
-    
-    selected = ~df.class_label.isin(map(str, black_list))
-    df_selected = df[selected]
-    return df_selected
-
 def load_data(path):
     selected_files = []
     pickle_file = None
@@ -101,7 +106,6 @@ def load_data(path):
         if os.path.isfile(pickle_file):
             print("read data from pickle")
             df = pd.read_pickle(pickle_file)
-            df = select_df_by_black_files(df, path)
             return df
         
         dpath = path
@@ -126,7 +130,6 @@ def load_data(path):
         print("save data into pickle")
         df.to_pickle(pickle_file)
 
-    df = select_df_by_black_files(df, path)
     return df
 
 def join_str(lengths):
