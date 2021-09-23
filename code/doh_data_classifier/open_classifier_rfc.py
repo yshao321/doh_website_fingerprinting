@@ -89,10 +89,10 @@ def classify(train, test):
     return list(y_test), list(yhat_test)
 
 
-num_classes = 5000 # Number of classes (sites)
-num_samples = 20   # Number of samples for each class (site)
-min_packets = 1    # Minimum of packets for each row (record)
-max_packets = 50   # Maximun of packets for each row (record)
+num_classes = 5000   # Number of classes (sites)
+num_samples = 20     # Number of samples for each class (site)
+min_packets = 1      # Minimum of packets for each row (record)
+max_packets = 50     # Maximun of packets for each row (record)
 
 num_classes_monitored = 100          # Number of classes to be monitored
 num_samples_train_unmonitored = 1    # Number of train samples from unmonitored
