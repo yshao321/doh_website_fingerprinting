@@ -118,7 +118,7 @@ done
 # Website output file
 WEBSITES_BLACK="${WEBSITES_INPUT}.blk"
 
-# Websites output file has three columns: website id, website name, and website return
+# Websites output file has four columns: id, name, http code and return
 [ -f $WEBSITES_BLACK ] && { echo "$WEBSITES_BLACK file already exists" 1>&2; exit 3; }
 
 ################################################################################################
