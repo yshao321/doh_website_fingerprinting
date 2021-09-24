@@ -89,29 +89,41 @@ def classify(train, test):
     return list(y_test), list(yhat_test)
 
 
-num_classes = 5000   # Number of classes (sites)
+num_classes = 10500  # Number of classes (sites)
 num_samples = 20     # Number of samples for each class (site)
 min_packets = 1      # Minimum of packets for each row (record)
 max_packets = 50     # Maximun of packets for each row (record)
 
-num_classes_monitored = 100          # Number of classes to be monitored
-num_samples_train_unmonitored = 1    # Number of train samples from unmonitored
-num_samples_test_unmonitored  = 1    # Number of test  samples from unmonitored
-num_samples_test_openedworld  = 1    # Number of test  samples from openedworld
-
+num_samples_openedworld       = 1    # Number of samples from openedworld
+num_classes_monitored         = 1000 # Number of classes from monitored
+num_samples_train_unmonitored = 4    # Number of training samples from unmonitored
+'''
+num_samples_train_monitored   = 16   # Number of training samples from monitored    (determined by k-fold: 20 * 4/5)
+num_samples_train_unmonitored = 16   # Number of training samples from unmonitored  (determined by k-fold: 20 * 4/5)
+num_samples_test_monitored    = 4    # Number of testing  samples from monitored    (determined by k-fold: 20 * 1/5)
+num_samples_test_unmonitored  = 4    # Number of testing  samples from unmonitored  (determined by k-fold: 20 * 1/5)
+'''
 def classifier_train():
     # Locate dataset
-    data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'train')
-    print(data_dir)
+    closed_data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'train')
+    print(closed_data_dir)
+    opened_data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'test')
+    print(opened_data_dir)
 
     # Load dataset
-    df = load_data(data_dir)
-    print("initial data", df.shape)
+    df_closed = load_data(closed_data_dir)
+    print("initial closed data", df_closed.shape)
+    df_opened = load_data(opened_data_dir)
+    print("initial opened data", df_opened.shape)
 
     # Clean dataset
-    df_closed = clean_df_closed(df, min_packets, max_packets, num_classes, num_samples)
-    df_opened = clean_df_opened(df, min_packets, max_packets, num_classes, num_samples_test_openedworld)
-    print("cleaned data", df_closed.shape, df_opened.shape)
+    df_closed = clean_df_closed(df_closed, min_packets, max_packets, num_classes, num_samples, False)
+    print("cleaned closed data", df_closed.shape)
+    df_opened = clean_df_opened(df_opened, min_packets, max_packets, 0, num_samples_openedworld, False)
+    print("cleaned opened data", df_opened.shape)
+
+    # Load black list classes
+    black_list = load_black_list()
 
     # Perform k-fold cross classification
     results = []
@@ -120,10 +132,11 @@ def classifier_train():
         df_train_k = df_closed.iloc[train_k]
         df_test_k = df_closed.iloc[test_k]
         
-        # Generate monitor list
+        # Generate a monitor list without black list classes
         monitor_list = random.sample(list(set(df_closed.class_label.tolist())), num_classes_monitored)
+        monitor_list = [x for x in monitor_list if x not in map(str, black_list)]
         
-        # Training = Monitored + Unmonitored
+        # Training: closedworld (monitored=16 unmonitored=4)
         df_train_monitored   = df_train_k[ df_train_k["class_label"].isin(monitor_list)]
         df_train_unmonitored = df_train_k[~df_train_k["class_label"].isin(monitor_list)]
         df_train_unmonitored = select_df_by_samples(df_train_unmonitored, num_samples_train_unmonitored)
@@ -132,12 +145,14 @@ def classifier_train():
         df_train_unmonitored.insert(0, "monitor_label", "unmonitored")
         df_train = pd.concat([df_train_monitored, df_train_unmonitored])
         
-        # Test = Monitored + Unmonitored + Openedworld
+        # Testing: closedworld (monitored=4 unmonitored=4) and openedworld (monitored=1 unmonitored=1)
         df_test_monitored   = df_test_k[ df_test_k["class_label"].isin(monitor_list)]
         df_test_unmonitored = df_test_k[~df_test_k["class_label"].isin(monitor_list)]
-        df_test_unmonitored = select_df_by_samples(df_test_unmonitored, num_samples_test_unmonitored)
-        df_test_unmonitored = pd.concat([df_test_unmonitored, df_opened])
-
+        df_open_monitored   = df_opened[ df_opened["class_label"].isin(monitor_list)]
+        df_open_unmonitored = df_opened[~df_opened["class_label"].isin(monitor_list)]
+        df_test_monitored   = pd.concat([df_test_monitored, df_open_monitored])
+        df_test_unmonitored = pd.concat([df_test_unmonitored, df_open_unmonitored])
+        
         df_test_monitored.insert(0, "monitor_label", "monitored")
         df_test_unmonitored.insert(0, "monitor_label", "unmonitored")
         df_test = pd.concat([df_test_monitored, df_test_unmonitored])

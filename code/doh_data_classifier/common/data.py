@@ -47,9 +47,9 @@ def select_df_by_min_classes(df, min_classes):
     df_selected = df[selected]
     return df_selected
 
-def select_df_by_black_files(df, dpath):
+def load_black_list():
     black_list = []
-    for root, _, files in os.walk(dpath):
+    for root, _, files in os.walk(COLLECTION_DIR):
         for fname in files:
             if not fname.endswith('.blk'):
                 continue
@@ -57,26 +57,34 @@ def select_df_by_black_files(df, dpath):
             df_black = pd.read_csv(black_file, header=None)
             black_list.extend(df_black.iloc[:,0].tolist())
     
+    return black_list
+
+def select_df_by_black_list(df):
+    black_list = load_black_list()
     selected = ~df.class_label.isin(map(str, black_list))
     df_selected = df[selected]
     return df_selected
 
-def clean_df_closed(df, min_packets, max_packets, max_classes, num_samples):
+def clean_df_closed(df, min_packets, max_packets, max_classes, num_samples, filter_by_black=True):
     df = select_df_by_packets(df, min_packets, max_packets)
     df = select_df_by_samples(df, num_samples)
     df = select_df_by_max_classes(df, max_classes)
-    df = select_df_by_black_files(df, COLLECTION_DIR)
+    
+    if filter_by_black:
+        df = select_df_by_black_list(df)
     
     df = df.sort_values('class_label')
     df.index = range(len(df.index))
 
     return df
 
-def clean_df_opened(df, min_packets, max_packets, min_classes, num_samples):
+def clean_df_opened(df, min_packets, max_packets, min_classes, num_samples, filter_by_black=True):
     df = select_df_by_packets(df, min_packets, max_packets)
     df = select_df_by_samples(df, num_samples)
     df = select_df_by_min_classes(df, min_classes)
-    df = select_df_by_black_files(df, COLLECTION_DIR)
+    
+    if filter_by_black:
+        df = select_df_by_black_list(df)
     
     df = df.sort_values('class_label')
     df.index = range(len(df.index))
