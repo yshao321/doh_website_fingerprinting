@@ -1,0 +1,33 @@
+Training...
+/home/help_raceaaa/wf_by_doh_google/dataset/train
+read data from pickle
+initial data (209893, 3)
+cleaned data (145275, 3)
+k-fold 0
+Accuracy Score: 0.9273791085871623
+--- 1086.0077822208405 seconds ---
+k-fold 1
+Accuracy Score: 0.9293409051798314
+--- 1082.8057827949524 seconds ---
+k-fold 2
+Accuracy Score: 0.9297194975047324
+--- 1081.1103298664093 seconds ---
+k-fold 3
+Accuracy Score: 0.9281707107210463
+--- 1072.7586188316345 seconds ---
+k-fold 4
+Accuracy Score: 0.9304422646704525
+--- 1076.7415993213654 seconds ---
+Mean
+precision        0.938876
+recall           0.929010
+f1-score         0.926124
+support      29055.000000
+Name: macro avg, dtype: float64
+Standard deviation
+precision    0.000406
+recall       0.001228
+f1-score     0.000958
+support      0.000000
+Name: macro avg, dtype: float64
+Training done!!!

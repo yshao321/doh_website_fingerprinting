@@ -89,8 +89,8 @@ def classify(train, test):
     return list(y_test), list(yhat_test)
 
 
-num_classes = 5000   # Number of classes (sites)
-num_samples = 10     # Number of samples for each class (site)
+num_classes = 10500  # Number of classes (sites)
+num_samples = 20     # Number of samples for each class (site)
 min_packets = 1      # Minimum of packets for each row (record)
 max_packets = 50     # Maximun of packets for each row (record)
 
