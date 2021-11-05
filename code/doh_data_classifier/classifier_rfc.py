@@ -137,6 +137,28 @@ def classifier_train():
     print("Standard deviation")
     print(statistics.xs('std', level=1))
 
+def classifier_build():
+    # Locate dataset
+    train_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'train')
+    print(train_dir)
+    test_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'test')
+    print(test_dir)
+
+    # Load dataset
+    df_train = load_data(train_dir)
+    print("initial train data", df_train.shape)
+    df_test = load_data(test_dir)
+    print("initial test data", df_test.shape)
+
+    # Clean dataset
+    df_train_cleaned = clean_df_closed(df_train, min_packets, max_packets, num_classes, num_samples)
+    print("cleaned train data", df_train_cleaned.shape)
+    df_test_cleaned = clean_df_closed(df_test, min_packets, max_packets, num_classes, 1)
+    print("cleaned test data", df_test_cleaned.shape)
+
+    start_time = time.time()
+    classify(df_train_cleaned, df_test_cleaned)
+    print("--- %s seconds ---" % (time.time() - start_time))
 
 def classifier_serve():
     # Load pipeline
@@ -167,12 +189,17 @@ if __name__ == '__main__':
             classifier_train()
             print("Training done!!!")
             exit(0)
+        elif (sys.argv[1] == 'build'):
+            print("Building...")
+            classifier_build()
+            print("Building done!!!")
+            exit(0)
         elif (sys.argv[1] == 'serve'):
             print("Serving...")
             classifier_serve()
             print("Serving done!!!")
             exit(0)
-    print("usage: doh_data_classify.py { train | serve }")
+    print("usage: doh_data_classify.py { train | build | serve }")
     exit(1)
 
 

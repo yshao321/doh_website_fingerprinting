@@ -1,0 +1,12 @@
+Building...
+/home/help_raceaaa/wf_by_doh_google/dataset/train
+/home/help_raceaaa/wf_by_doh_google/dataset/test
+read data from pickle
+initial train data (209893, 3)
+read data from pickle
+initial test data (99995, 3)
+cleaned train data (144075, 3)
+cleaned test data (9605, 3)
+Accuracy Score: 0.9659552316501822
+--- 779.6626176834106 seconds ---
+Building done!!!
