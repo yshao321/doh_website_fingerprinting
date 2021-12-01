@@ -1,0 +1,41 @@
+PS D:\loyola\388 - Topics in Cybersecurity\project\wf_by_doh_windows\code\doh_data_classifier> python .\2_open_classifier_rfc.py train
+Training...
+D:\loyola\388 - Topics in Cybersecurity\project\wf_by_doh_windows\dataset\train
+D:\loyola\388 - Topics in Cybersecurity\project\wf_by_doh_windows\dataset\test
+read data from pickle
+initial closed data (209893, 3)
+read data from pickle
+initial opened data (99995, 3)
+cleaned closed data (190700, 3)
+cleaned opened data (99100, 3)
+k-fold 0
+Best Threshold=0.629603, F-Score=0.932, Precision=0.930, Recall=0.935
+--- 1292.1288845539093 seconds ---
+k-fold 1
+Best Threshold=0.644384, F-Score=0.931, Precision=0.937, Recall=0.924
+--- 1276.920304775238 seconds ---
+k-fold 2
+Best Threshold=0.632274, F-Score=0.932, Precision=0.932, Recall=0.932
+--- 1303.7413890361786 seconds ---
+k-fold 3
+Best Threshold=0.619048, F-Score=0.931, Precision=0.922, Recall=0.941
+--- 1303.1724450588226 seconds ---
+k-fold 4
+Best Threshold=0.629361, F-Score=0.933, Precision=0.929, Recall=0.936
+--- 1278.8655388355255 seconds ---
+k-fold 5
+Best Threshold=0.631470, F-Score=0.936, Precision=0.936, Recall=0.936
+--- 1300.097804069519 seconds ---
+k-fold 6
+Best Threshold=0.630612, F-Score=0.932, Precision=0.931, Recall=0.933
+--- 1300.233141899109 seconds ---
+k-fold 7
+Best Threshold=0.616226, F-Score=0.931, Precision=0.920, Recall=0.942
+--- 1293.2239544391632 seconds ---
+k-fold 8
+Best Threshold=0.636773, F-Score=0.932, Precision=0.932, Recall=0.931
+--- 1294.4279248714447 seconds ---
+k-fold 9
+Best Threshold=0.628895, F-Score=0.926, Precision=0.926, Recall=0.926
+--- 1290.0889115333557 seconds ---
+Training done!!!

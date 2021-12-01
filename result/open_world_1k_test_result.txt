@@ -1,0 +1,15 @@
+Building...
+D:\project\wf_by_doh_windows\dataset\train
+D:\project\wf_by_doh_windows\dataset\test
+read data from pickle
+initial closed data (209893, 3)
+read data from pickle
+initial opened data (99995, 3)
+cleaned closed data (208520, 3)
+cleaned opened data (99995, 3)
+Best Threshold=0.308683, F-Score=0.929, Precision=0.925, Recall=0.932
+Best Threshold=0.357143, F-Score=0.900, Precision=0.885, Recall=0.916
+Best Threshold=0.442857, F-Score=0.861, Precision=0.857, Recall=0.866
+Best Threshold=0.500000, F-Score=0.805, Precision=0.785, Recall=0.827
+--- 3174.4117143154144 seconds ---
+Building done!!!

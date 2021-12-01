@@ -1,0 +1,21 @@
+Training...
+D:\project\wf_by_doh_windows\dataset\train
+read data from pickle
+initial closed data (209893, 3)
+cleaned closed data (208520, 3)
+k-fold 0
+Best Threshold=0.200000, F-Score=0.922, Precision=0.929, Recall=0.916
+--- 668.6950416564941 seconds ---
+k-fold 1
+Best Threshold=0.194034, F-Score=0.926, Precision=0.923, Recall=0.929
+--- 731.4850330352783 seconds ---
+k-fold 2
+Best Threshold=0.214286, F-Score=0.923, Precision=0.935, Recall=0.911
+--- 729.175023317337 seconds ---
+k-fold 3
+Best Threshold=0.194966, F-Score=0.923, Precision=0.932, Recall=0.914
+--- 726.5260014533997 seconds ---
+k-fold 4
+Best Threshold=0.214286, F-Score=0.924, Precision=0.935, Recall=0.914
+--- 742.5010287761688 seconds ---
+Training done!!!

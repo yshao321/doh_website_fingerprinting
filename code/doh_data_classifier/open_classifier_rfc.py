@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import dill
 import random
+import matplotlib.pyplot as plt
 
 from os.path import join, dirname, abspath, pardir, basename
 from sklearn.pipeline import FeatureUnion, Pipeline
@@ -57,15 +58,14 @@ class NgramsExtractor:
         #return np.concatenate((positive_ngrams.todense(), negative_ngrams.todense()), axis=1)
         return positive_ngrams.todense()
 
-def classify(train, test):
+
+def classify(train, tests, show_curve=False):
     # Ngrams feature extractor
     combinedFeatures = FeatureUnion([('ngrams', NgramsExtractor(1, 2))])
     
     # Training and validation data
     X_train = combinedFeatures.fit_transform(train)
     y_train = np.array(train.monitor_label)
-    X_test  = combinedFeatures.transform(test)
-    y_test  = np.array(test.monitor_label)
     
     # Model training
     batch_mode = False
@@ -79,14 +79,31 @@ def classify(train, test):
         rfc = RandomForestClassifier(n_estimators=70)
         rfc.fit(X_train, y_train)
     
-    # Model evaluation
-    yhat_test = rfc.predict(X_test)
+    for test in tests:
+        X_test  = combinedFeatures.transform(test[1])
+        y_test  = np.array(test[1].monitor_label)
+        
+        # Model evaluation
+        yhat_test = rfc.predict(X_test)
+        
+        # Precision recall curve
+        from sklearn.metrics import precision_recall_curve
+        from numpy import argmax
+        y_score = rfc.predict_proba(X_test)
+        precision, recall, thresholds = precision_recall_curve(y_test, y_score[:,0], pos_label="monitored")
+        fscore = (2 * precision * recall) / (precision + recall)
+        index = argmax(fscore)
+        print('Best Threshold=%f, F-Score=%.3f, Precision=%.3f, Recall=%.3f' % (thresholds[index], fscore[index], precision[index], recall[index]))
+        
+        plt.plot(recall, precision, label=test[0])
+        plt.scatter(recall[index], precision[index], marker='o', color='black')
     
-    # Accuracy metric
-    acc = accuracy_score(y_test, yhat_test)
-    print("Accuracy Score:", acc)
-    
-    return list(y_test), list(yhat_test)
+    if show_curve:
+        plt.xlabel("recall")
+        plt.ylabel("precision")
+        plt.legend(loc="best")
+        plt.title("precision vs. recall")
+        plt.show()
 
 
 num_classes = 10500  # Number of classes (sites)
@@ -94,16 +111,60 @@ num_samples = 20     # Number of samples for each class (site)
 min_packets = 1      # Minimum of packets for each row (record)
 max_packets = 50     # Maximun of packets for each row (record)
 
-num_samples_openedworld       = 1    # Number of samples from openedworld
-num_classes_monitored         = 1000 # Number of classes from monitored
-num_samples_train_unmonitored = 4    # Number of training samples from unmonitored
-'''
-num_samples_train_monitored   = 16   # Number of training samples from monitored    (determined by k-fold: 20 * 4/5)
-num_samples_train_unmonitored = 16   # Number of training samples from unmonitored  (determined by k-fold: 20 * 4/5)
-num_samples_test_monitored    = 4    # Number of testing  samples from monitored    (determined by k-fold: 20 * 1/5)
-num_samples_test_unmonitored  = 4    # Number of testing  samples from unmonitored  (determined by k-fold: 20 * 1/5)
-'''
+num_classes_monitored = 1000 # Number of classes to be monitored
+
 def classifier_train():
+    # Locate dataset
+    closed_data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'train')
+    print(closed_data_dir)
+
+    # Load dataset
+    df_closed = load_data(closed_data_dir)
+    print("initial closed data", df_closed.shape)
+
+    # Clean dataset
+    df_closed = clean_df_closed(df_closed, min_packets, max_packets, num_classes, num_samples, False)
+    print("cleaned closed data", df_closed.shape)
+
+    # Generate a monitor list without black list classes
+    black_list = load_black_list()
+    monitor_list = random.sample(list(set(df_closed.class_label.tolist())), num_classes_monitored)
+    monitor_list = [x for x in monitor_list if x not in map(str, black_list)]
+
+    # Prepare cross-validation dataset
+    df_cv = df_closed
+
+    # Perform k-fold cross classification
+    kf = StratifiedKFold(n_splits = 5)
+    for k, (train_k, test_k) in enumerate(kf.split(df_cv, df_cv.class_label)):
+        df_train_k = df_cv.iloc[train_k]
+        df_test_k = df_cv.iloc[test_k]
+        
+        # Training data
+        df_train_monitored   = df_train_k[ df_train_k["class_label"].isin(monitor_list)]
+        df_train_unmonitored = df_train_k[~df_train_k["class_label"].isin(monitor_list)]
+        
+        # Training label
+        df_train_monitored.insert(0, "monitor_label", "monitored")
+        df_train_unmonitored.insert(0, "monitor_label", "unmonitored")
+        df_train = pd.concat([df_train_monitored, df_train_unmonitored])
+        
+        # Testing data
+        df_test_monitored   = df_test_k[ df_test_k["class_label"].isin(monitor_list)]
+        df_test_unmonitored = df_test_k[~df_test_k["class_label"].isin(monitor_list)]
+        
+        # Testing label
+        df_test_monitored.insert(0, "monitor_label", "monitored")
+        df_test_unmonitored.insert(0, "monitor_label", "unmonitored")
+        df_test = pd.concat([df_test_monitored, df_test_unmonitored])
+        
+        print("k-fold", k)
+        start_time = time.time()
+        classify(df_train, [(None, df_test)])
+        print("--- %s seconds ---" % (time.time() - start_time))
+
+
+def classifier_build():
     # Locate dataset
     closed_data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'train')
     print(closed_data_dir)
@@ -119,69 +180,35 @@ def classifier_train():
     # Clean dataset
     df_closed = clean_df_closed(df_closed, min_packets, max_packets, num_classes, num_samples, False)
     print("cleaned closed data", df_closed.shape)
-    df_opened = clean_df_opened(df_opened, min_packets, max_packets, 0, num_samples_openedworld, False)
+    df_opened = clean_df_opened(df_opened, min_packets, max_packets, 0, 1, False)
     print("cleaned opened data", df_opened.shape)
 
-    # Load black list classes
+    # Generate a monitor list without black list classes
     black_list = load_black_list()
+    monitor_list = random.sample(list(set(df_closed.class_label.tolist())), num_classes_monitored)
+    monitor_list = [x for x in monitor_list if x not in map(str, black_list)]
 
-    # Perform k-fold cross classification
-    results = []
-    kf = StratifiedKFold(n_splits = 5)
-    for k, (train_k, test_k) in enumerate(kf.split(df_closed, df_closed.class_label)):
-        df_train_k = df_closed.iloc[train_k]
-        df_test_k = df_closed.iloc[test_k]
-        
-        # Generate a monitor list without black list classes
-        monitor_list = random.sample(list(set(df_closed.class_label.tolist())), num_classes_monitored)
-        monitor_list = [x for x in monitor_list if x not in map(str, black_list)]
-        
-        # Training: closedworld (monitored=16 unmonitored=4)
-        df_train_monitored   = df_train_k[ df_train_k["class_label"].isin(monitor_list)]
-        df_train_unmonitored = df_train_k[~df_train_k["class_label"].isin(monitor_list)]
-        df_train_unmonitored = select_df_by_samples(df_train_unmonitored, num_samples_train_unmonitored)
-        
-        df_train_monitored.insert(0, "monitor_label", "monitored")
-        df_train_unmonitored.insert(0, "monitor_label", "unmonitored")
-        df_train = pd.concat([df_train_monitored, df_train_unmonitored])
-        
-        # Testing: closedworld (monitored=4 unmonitored=4) and openedworld (monitored=1 unmonitored=1)
-        df_test_monitored   = df_test_k[ df_test_k["class_label"].isin(monitor_list)]
-        df_test_unmonitored = df_test_k[~df_test_k["class_label"].isin(monitor_list)]
-        df_open_monitored   = df_opened[ df_opened["class_label"].isin(monitor_list)]
-        df_open_unmonitored = df_opened[~df_opened["class_label"].isin(monitor_list)]
-        df_test_monitored   = pd.concat([df_test_monitored, df_open_monitored])
-        df_test_unmonitored = pd.concat([df_test_unmonitored, df_open_unmonitored])
-        
-        df_test_monitored.insert(0, "monitor_label", "monitored")
-        df_test_unmonitored.insert(0, "monitor_label", "unmonitored")
-        df_test = pd.concat([df_test_monitored, df_test_unmonitored])
-        
-        print("k-fold", k)
-        start_time = time.time()
-        result = classify(df_train, df_test)
-        print("--- %s seconds ---" % (time.time() - start_time))
-        results.append(result)
+    # Training data
+    df_train_monitored   = df_closed[ df_closed["class_label"].isin(monitor_list)]
+    df_train_unmonitored = df_closed[~df_closed["class_label"].isin(monitor_list)]
 
-    # Classification report
-    reports = pd.DataFrame(columns=['k-fold', 'label', 'precision', 'recall', 'f1-score', 'support'])
-    true_vectors, pred_vectors = [r[0] for r in results], [r[1] for r in results]
-    for i, (y_true, y_pred) in enumerate(zip(true_vectors, pred_vectors)):
-        # The precision, recall, F1 score for each class and averages in one k-fold
-        output = classification_report(y_true, y_pred, output_dict=True, zero_division=0)
-        
-        report = pd.DataFrame(output).transpose()
-        report = report.reset_index()
-        report = report.rename(columns={'index': 'label'})
-        report['k-fold'] = i
-        reports = reports.append(report)
+    # Training label
+    df_train_monitored.insert(0, "monitor_label", "monitored")
+    df_train_unmonitored.insert(0, "monitor_label", "unmonitored")
+    df_train = pd.concat([df_train_monitored, df_train_unmonitored])
 
-    # Statistics report
-    statistics = reports.groupby('label').describe().loc['macro avg']
-    print("Mean")
-    print(statistics.xs('mean', level=1))
-    print("Standard deviation")
-    print(statistics.xs('std', level=1))
+    # Testing data
+    df_test_monitored   = df_opened[ df_opened["class_label"].isin(monitor_list)]
+    df_test_unmonitored = df_opened[~df_opened["class_label"].isin(monitor_list)]
+
+    # Testing label
+    df_test_monitored.insert(0, "monitor_label", "monitored")
+    df_test_unmonitored.insert(0, "monitor_label", "unmonitored")
+    df_test = pd.concat([df_test_monitored, df_test_unmonitored])
+
+    start_time = time.time()
+    classify(df_train, [('10,000', df_test[:10000]), ('20,000', df_test[:20000]), ('50,000', df_test[:50000]), ('100,000', df_test[:100000])], True)
+    print("--- %s seconds ---" % (time.time() - start_time))
 
 
 def classifier_serve():
@@ -213,12 +240,17 @@ if __name__ == '__main__':
             classifier_train()
             print("Training done!!!")
             exit(0)
+        elif (sys.argv[1] == 'build'):
+            print("Building...")
+            classifier_build()
+            print("Building done!!!")
+            exit(0)
         elif (sys.argv[1] == 'serve'):
             print("Serving...")
             classifier_serve()
             print("Serving done!!!")
             exit(0)
-    print("usage: doh_data_classify.py { train | serve }")
+    print("usage: doh_data_classify.py { train | build | serve }")
     exit(1)
 
 

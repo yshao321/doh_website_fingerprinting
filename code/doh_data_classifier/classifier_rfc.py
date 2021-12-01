@@ -156,6 +156,11 @@ def classifier_build():
     df_test_cleaned = clean_df_closed(df_test, min_packets, max_packets, num_classes, 1)
     print("cleaned test data", df_test_cleaned.shape)
 
+    # Remove test labels which are not in training labels
+    train_list = list(set(df_train_cleaned.class_label.tolist()))
+    df_test_cleaned = df_test_cleaned[df_test_cleaned["class_label"].isin(train_list)]
+    print("cleaned cleaned test data", df_test_cleaned.shape)
+
     start_time = time.time()
     classify(df_train_cleaned, df_test_cleaned)
     print("--- %s seconds ---" % (time.time() - start_time))
