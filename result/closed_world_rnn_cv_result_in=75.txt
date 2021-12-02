@@ -1,0 +1,153 @@
+2021-12-02 07:25:46.300539: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library cudart64_110.dll
+Training...
+D:\loyola\388 - Topics in Cybersecurity\project\wf_by_doh_windows\dataset\train
+read data from pickle
+initial data (209893, 3)
+cleaned data (190460, 3)
+token index 1019
+k-fold 0
+2021-12-02 07:25:53.763331: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library nvcuda.dll
+2021-12-02 07:25:54.770765: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1733] Found device 0 with properties:
+pciBusID: 0000:01:00.0 name: NVIDIA GeForce GTX 1650 Ti computeCapability: 7.5
+coreClock: 1.485GHz coreCount: 16 deviceMemorySize: 4.00GiB deviceMemoryBandwidth: 178.84GiB/s
+2021-12-02 07:25:54.771055: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library cudart64_110.dll
+2021-12-02 07:25:54.780713: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library cublas64_11.dll
+2021-12-02 07:25:54.780883: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library cublasLt64_11.dll
+2021-12-02 07:25:54.786354: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library cufft64_10.dll
+2021-12-02 07:25:54.790300: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library curand64_10.dll
+2021-12-02 07:25:54.795142: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library cusolver64_11.dll
+2021-12-02 07:25:54.800591: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library cusparse64_11.dll
+2021-12-02 07:25:54.802708: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library cudnn64_8.dll
+2021-12-02 07:25:54.803126: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1871] Adding visible gpu devices: 0
+2021-12-02 07:25:54.803758: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX AVX2
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2021-12-02 07:25:54.804892: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1733] Found device 0 with properties:
+pciBusID: 0000:01:00.0 name: NVIDIA GeForce GTX 1650 Ti computeCapability: 7.5
+coreClock: 1.485GHz coreCount: 16 deviceMemorySize: 4.00GiB deviceMemoryBandwidth: 178.84GiB/s
+2021-12-02 07:25:54.805287: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1871] Adding visible gpu devices: 0
+2021-12-02 07:25:55.282757: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1258] Device interconnect StreamExecutor with strength 1 edge matrix:
+2021-12-02 07:25:55.282922: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1264]      0
+2021-12-02 07:25:55.283040: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1277] 0:   N
+2021-12-02 07:25:55.283304: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1418] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 2145 MB memory) -> physical GPU (device: 0, name: NVIDIA GeForce GTX 1650 Ti, pci bus id: 0000:01:00.0, compute capability: 7.5)
+Model: "sequential"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+lstm (LSTM)                  (None, 256)               1307648
+_________________________________________________________________
+dense (Dense)                (None, 256)               65792
+_________________________________________________________________
+dense_1 (Dense)              (None, 10501)             2698757
+=================================================================
+Total params: 4,072,197
+Trainable params: 4,072,197
+Non-trainable params: 0
+_________________________________________________________________
+None
+2021-12-02 07:25:55.962786: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:176] None of the MLIR Optimization Passes are enabled (registered 2)
+Epoch 1/50
+2021-12-02 07:26:07.413715: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library cudnn64_8.dll
+2021-12-02 07:26:07.923312: I tensorflow/stream_executor/cuda/cuda_dnn.cc:359] Loaded cuDNN version 8200
+2021-12-02 07:26:08.133448: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library cublas64_11.dll
+2021-12-02 07:26:08.625324: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library cublasLt64_11.dll
+596/596 [==============================] - 104s 154ms/step - loss: 8.9459 - accuracy: 1.2439e-04 - val_loss: 8.2328 - val_accuracy: 7.3506e-04
+Epoch 2/50
+596/596 [==============================] - 102s 171ms/step - loss: 8.1400 - accuracy: 4.2848e-04 - val_loss: 7.9216 - val_accuracy: 0.0013
+Epoch 3/50
+596/596 [==============================] - 95s 159ms/step - loss: 7.7016 - accuracy: 0.0023 - val_loss: 7.3832 - val_accuracy: 0.0069
+Epoch 4/50
+596/596 [==============================] - 100s 168ms/step - loss: 6.9426 - accuracy: 0.0121 - val_loss: 6.5384 - val_accuracy: 0.0304
+Epoch 5/50
+596/596 [==============================] - 96s 161ms/step - loss: 6.0818 - accuracy: 0.0427 - val_loss: 5.6626 - val_accuracy: 0.0871
+Epoch 6/50
+596/596 [==============================] - 96s 161ms/step - loss: 5.2195 - accuracy: 0.1046 - val_loss: 5.1210 - val_accuracy: 0.1277
+Epoch 7/50
+596/596 [==============================] - 96s 162ms/step - loss: 4.4490 - accuracy: 0.1847 - val_loss: 4.2941 - val_accuracy: 0.2184
+Epoch 8/50
+596/596 [==============================] - 96s 162ms/step - loss: 3.8011 - accuracy: 0.2669 - val_loss: 4.1467 - val_accuracy: 0.2434
+Epoch 9/50
+596/596 [==============================] - 96s 162ms/step - loss: 3.2868 - accuracy: 0.3427 - val_loss: 3.6058 - val_accuracy: 0.3192
+Epoch 10/50
+596/596 [==============================] - 96s 161ms/step - loss: 2.8710 - accuracy: 0.4082 - val_loss: 3.2437 - val_accuracy: 0.3585
+Epoch 11/50
+596/596 [==============================] - 96s 161ms/step - loss: 2.5216 - accuracy: 0.4671 - val_loss: 3.0697 - val_accuracy: 0.3894
+Epoch 12/50
+596/596 [==============================] - 96s 161ms/step - loss: 2.2462 - accuracy: 0.5183 - val_loss: 2.7843 - val_accuracy: 0.4296
+Epoch 13/50
+596/596 [==============================] - 96s 161ms/step - loss: 2.0004 - accuracy: 0.5611 - val_loss: 2.3356 - val_accuracy: 0.5156
+Epoch 14/50
+596/596 [==============================] - 96s 161ms/step - loss: 1.8069 - accuracy: 0.5987 - val_loss: 2.2463 - val_accuracy: 0.5459
+Epoch 15/50
+596/596 [==============================] - 97s 162ms/step - loss: 1.6235 - accuracy: 0.6359 - val_loss: 2.1681 - val_accuracy: 0.5430
+Epoch 16/50
+596/596 [==============================] - 96s 161ms/step - loss: 1.4826 - accuracy: 0.6643 - val_loss: 1.6309 - val_accuracy: 0.6587
+Epoch 17/50
+596/596 [==============================] - 96s 162ms/step - loss: 1.3405 - accuracy: 0.6934 - val_loss: 1.7599 - val_accuracy: 0.6233
+Epoch 18/50
+596/596 [==============================] - 96s 161ms/step - loss: 1.2273 - accuracy: 0.7175 - val_loss: 1.7725 - val_accuracy: 0.6459
+Epoch 19/50
+596/596 [==============================] - 96s 161ms/step - loss: 1.1363 - accuracy: 0.7350 - val_loss: 1.4204 - val_accuracy: 0.7032
+Epoch 20/50
+596/596 [==============================] - 96s 162ms/step - loss: 1.0466 - accuracy: 0.7554 - val_loss: 1.3489 - val_accuracy: 0.7157
+Epoch 21/50
+596/596 [==============================] - 96s 162ms/step - loss: 0.9691 - accuracy: 0.7702 - val_loss: 1.4248 - val_accuracy: 0.7076
+Epoch 22/50
+596/596 [==============================] - 98s 164ms/step - loss: 0.9045 - accuracy: 0.7851 - val_loss: 1.2204 - val_accuracy: 0.7433
+Epoch 23/50
+596/596 [==============================] - 95s 159ms/step - loss: 0.8474 - accuracy: 0.7971 - val_loss: 1.1416 - val_accuracy: 0.7624
+Epoch 24/50
+596/596 [==============================] - 93s 156ms/step - loss: 0.7956 - accuracy: 0.8087 - val_loss: 1.2235 - val_accuracy: 0.7468
+Epoch 25/50
+596/596 [==============================] - 93s 156ms/step - loss: 0.7426 - accuracy: 0.8212 - val_loss: 1.0573 - val_accuracy: 0.7744
+Epoch 26/50
+596/596 [==============================] - 93s 156ms/step - loss: 0.7101 - accuracy: 0.8277 - val_loss: 1.0498 - val_accuracy: 0.7874
+Epoch 27/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.6701 - accuracy: 0.8362 - val_loss: 1.0381 - val_accuracy: 0.7792
+Epoch 28/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.6316 - accuracy: 0.8442 - val_loss: 0.9761 - val_accuracy: 0.8029
+Epoch 29/50
+596/596 [==============================] - 92s 154ms/step - loss: 0.6040 - accuracy: 0.8513 - val_loss: 0.9743 - val_accuracy: 0.7973
+Epoch 30/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.5761 - accuracy: 0.8567 - val_loss: 0.9209 - val_accuracy: 0.8109
+Epoch 31/50
+596/596 [==============================] - 94s 158ms/step - loss: 0.5482 - accuracy: 0.8627 - val_loss: 1.0640 - val_accuracy: 0.7930
+Epoch 32/50
+596/596 [==============================] - 92s 154ms/step - loss: 0.5264 - accuracy: 0.8691 - val_loss: 0.9148 - val_accuracy: 0.8192
+Epoch 33/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.5047 - accuracy: 0.8737 - val_loss: 0.8878 - val_accuracy: 0.8209
+Epoch 34/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.4771 - accuracy: 0.8793 - val_loss: 0.9102 - val_accuracy: 0.8178
+Epoch 35/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.4685 - accuracy: 0.8826 - val_loss: 0.8324 - val_accuracy: 0.8363
+Epoch 36/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.4456 - accuracy: 0.8873 - val_loss: 0.8244 - val_accuracy: 0.8416
+Epoch 37/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.4278 - accuracy: 0.8914 - val_loss: 0.8301 - val_accuracy: 0.8357
+Epoch 38/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.4156 - accuracy: 0.8942 - val_loss: 0.9291 - val_accuracy: 0.8143
+Epoch 39/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.4008 - accuracy: 0.8985 - val_loss: 0.8669 - val_accuracy: 0.8393
+Epoch 40/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.3915 - accuracy: 0.9011 - val_loss: 0.8141 - val_accuracy: 0.8429
+Epoch 41/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.3800 - accuracy: 0.9033 - val_loss: 0.9740 - val_accuracy: 0.8108
+Epoch 42/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.3634 - accuracy: 0.9065 - val_loss: 0.7812 - val_accuracy: 0.8510
+Epoch 43/50
+596/596 [==============================] - 92s 154ms/step - loss: 0.3521 - accuracy: 0.9094 - val_loss: 0.7749 - val_accuracy: 0.8519
+Epoch 44/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.3441 - accuracy: 0.9121 - val_loss: 0.8059 - val_accuracy: 0.8458
+Epoch 45/50
+596/596 [==============================] - 92s 154ms/step - loss: 0.3365 - accuracy: 0.9139 - val_loss: 0.7784 - val_accuracy: 0.8557
+Epoch 46/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.3233 - accuracy: 0.9156 - val_loss: 0.7849 - val_accuracy: 0.8505
+Epoch 47/50
+596/596 [==============================] - 92s 154ms/step - loss: 0.3162 - accuracy: 0.9179 - val_loss: 0.7464 - val_accuracy: 0.8584
+Epoch 48/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.3101 - accuracy: 0.9195 - val_loss: 0.7575 - val_accuracy: 0.8593
+Epoch 49/50
+596/596 [==============================] - 92s 155ms/step - loss: 0.2976 - accuracy: 0.9229 - val_loss: 0.7584 - val_accuracy: 0.8635
+Epoch 50/50
+596/596 [==============================] - 92s 154ms/step - loss: 0.2952 - accuracy: 0.9230 - val_loss: 0.7369 - val_accuracy: 0.8661
+--- 4724.21374797821 seconds ---
+Training done!!!

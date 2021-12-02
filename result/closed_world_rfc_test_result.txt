@@ -1,3 +1,4 @@
+help_raceaaa@instance-1:~/wf_by_doh_google/code/doh_data_classifier$ python3 classifier_rfc.py build
 Building...
 /home/help_raceaaa/wf_by_doh_google/dataset/train
 /home/help_raceaaa/wf_by_doh_google/dataset/test
@@ -5,8 +6,9 @@ read data from pickle
 initial train data (209893, 3)
 read data from pickle
 initial test data (99995, 3)
-cleaned train data (144075, 3)
+cleaned train data (190700, 3)
 cleaned test data (9605, 3)
-Accuracy Score: 0.9659552316501822
---- 779.6626176834106 seconds ---
+cleaned cleaned test data (9535, 3)
+Accuracy Score: 0.9671735710540116
+--- 1387.2209837436676 seconds ---
 Building done!!!
