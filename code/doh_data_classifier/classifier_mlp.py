@@ -12,12 +12,8 @@ import dill
 import random
 
 from os.path import join, dirname, abspath, pardir, basename
-from sklearn.pipeline import FeatureUnion, Pipeline
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import KFold
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 
 from common.data import *
 
@@ -79,7 +75,7 @@ token_index = {}     # An index of all tokens in the data
 
 def classifier_train():
     # Locate dataset
-    data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'train')
+    data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'closed-world')
     print(data_dir)
 
     # Load dataset

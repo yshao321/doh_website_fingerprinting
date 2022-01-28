@@ -16,6 +16,7 @@ from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import KFold
+from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 
@@ -81,12 +82,13 @@ def classify(train, test):
     
     # Model evaluation
     yhat_test = rfc.predict(X_test)
+    yhat_prob = np.max(rfc.predict_proba(X_test), axis=1)
     
     # Accuracy metric
     acc = accuracy_score(y_test, yhat_test)
     print("Accuracy Score:", acc)
     
-    return list(y_test), list(yhat_test)
+    return y_test, yhat_test, yhat_prob
 
 
 num_classes = 10500  # Number of classes (sites)
@@ -96,7 +98,7 @@ max_packets = 50     # Maximun of packets for each row (record)
 
 def classifier_train():
     # Locate dataset
-    data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'train')
+    data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'closed-world')
     print(data_dir)
 
     # Load dataset
@@ -104,16 +106,19 @@ def classifier_train():
     print("initial data", df.shape)
 
     # Clean dataset
-    df_closed = clean_df_closed(df, min_packets, max_packets, num_classes, num_samples)
-    print("cleaned data", df_closed.shape)
+    df_cleaned = clean_df_closed(df, min_packets, max_packets, num_classes, num_samples)
+    print("cleaned data", df_cleaned.shape)
+
+    # Split dataset: train 90%, test 10%
+    df_train, df_test, _, _ = train_test_split(df_cleaned, df_cleaned.class_label, test_size=0.1, stratify=df_cleaned.class_label)
 
     # Perform k-fold cross classification
     results = []
     kf = StratifiedKFold(n_splits = 5)
-    for k, (train_k, test_k) in enumerate(kf.split(df_closed, df_closed.class_label)):
+    for k, (train_k, val_k) in enumerate(kf.split(df_train, df_train.class_label)):
         print("k-fold", k)
         start_time = time.time()
-        result = classify(df_closed.iloc[train_k], df_closed.iloc[test_k])
+        result = classify(df_train.iloc[train_k], df_train.iloc[val_k])
         print("--- %s seconds ---" % (time.time() - start_time))
         results.append(result)
 
@@ -137,11 +142,16 @@ def classifier_train():
     print("Standard deviation")
     print(statistics.xs('std', level=1))
 
+    # Test dataset accuracy
+    start_time = time.time()
+    classify(df_train, df_test)
+    print("--- %s seconds ---" % (time.time() - start_time))
+
 def classifier_build():
     # Locate dataset
-    train_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'train')
+    train_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'closed-world')
     print(train_dir)
-    test_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'test')
+    test_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'open-world')
     print(test_dir)
 
     # Load dataset
@@ -153,7 +163,7 @@ def classifier_build():
     # Clean dataset
     df_train_cleaned = clean_df_closed(df_train, min_packets, max_packets, num_classes, num_samples)
     print("cleaned train data", df_train_cleaned.shape)
-    df_test_cleaned = clean_df_closed(df_test, min_packets, max_packets, num_classes, 1)
+    df_test_cleaned = clean_df_opened(df_test, min_packets, max_packets, 0, 1)
     print("cleaned test data", df_test_cleaned.shape)
 
     # Remove test labels which are not in training labels
@@ -162,8 +172,12 @@ def classifier_build():
     print("cleaned cleaned test data", df_test_cleaned.shape)
 
     start_time = time.time()
-    classify(df_train_cleaned, df_test_cleaned)
+    target, prediction, probability = classify(df_train_cleaned, df_test_cleaned)
     print("--- %s seconds ---" % (time.time() - start_time))
+
+    # Save result into CSV
+    cw_result = np.column_stack((target.astype(int), prediction.astype(int), probability))
+    np.savetxt("cw_result.csv", cw_result, delimiter=",", fmt="%.2f")
 
 def classifier_serve():
     # Load pipeline

@@ -12,12 +12,9 @@ import dill
 import random
 
 from os.path import join, dirname, abspath, pardir, basename
-from sklearn.pipeline import FeatureUnion, Pipeline
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import KFold
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
+from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 from keras.utils.np_utils import to_categorical
 
@@ -105,7 +102,7 @@ token_index = {}     # An index of all tokens in the data
 
 def classifier_train():
     # Locate dataset
-    data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'train')
+    data_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'closed-world')
     print(data_dir)
 
     # Load dataset
@@ -113,24 +110,27 @@ def classifier_train():
     print("initial data", df.shape)
 
     # Clean dataset
-    df_closed = clean_df_closed(df, min_packets, max_packets, num_classes, num_samples)
-    print("cleaned data", df_closed.shape)
+    df_cleaned = clean_df_closed(df, min_packets, max_packets, num_classes, num_samples)
+    print("cleaned data", df_cleaned.shape)
 
     # Build token index
-    for sample in df_closed.lengths:
+    for sample in df_cleaned.lengths:
         for number in sample:
             if number not in token_index:
                 token_index[number] = len(token_index) + 1
     print("token index", len(token_index))
 
+    # Split dataset: train 90%, test 10%
+    df_train, df_test, _, _ = train_test_split(df_cleaned, df_cleaned.class_label, test_size=0.1, stratify=df_cleaned.class_label)
+
     # Perform k-fold cross classification
     train_results = []
     valid_results = []
     kf = StratifiedKFold(n_splits = 5)
-    for k, (train_k, test_k) in enumerate(kf.split(df_closed, df_closed.class_label)):
+    for k, (train_k, val_k) in enumerate(kf.split(df_train, df_train.class_label)):
         print("k-fold", k)
         start_time = time.time()
-        result = classify(df_closed.iloc[train_k], df_closed.iloc[test_k])
+        result = classify(df_train.iloc[train_k], df_train.iloc[val_k])
         print("--- %s seconds ---" % (time.time() - start_time))
         train_results.append(result.history['accuracy'])
         valid_results.append(result.history['val_accuracy'])
@@ -151,11 +151,16 @@ def classifier_train():
     plt.ylabel('Validation ACC')
     plt.show()
 
+    # Test dataset accuracy
+    start_time = time.time()
+    classify(df_train, df_test)
+    print("--- %s seconds ---" % (time.time() - start_time))
+
 def classifier_build():
     # Locate dataset
-    train_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'train')
+    train_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'closed-world')
     print(train_dir)
-    test_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'test')
+    test_dir = join(abspath(join(dirname("__file__"), pardir, pardir)), 'dataset', 'open-world')
     print(test_dir)
 
     # Load dataset
@@ -167,7 +172,7 @@ def classifier_build():
     # Clean dataset
     df_train_cleaned = clean_df_closed(df_train, min_packets, max_packets, num_classes, num_samples)
     print("cleaned train data", df_train_cleaned.shape)
-    df_test_cleaned = clean_df_closed(df_test, min_packets, max_packets, num_classes, 1)
+    df_test_cleaned = clean_df_opened(df_test, min_packets, max_packets, 0, 1)
     print("cleaned test data", df_test_cleaned.shape)
 
     # Remove test labels which are not in training labels
